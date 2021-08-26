@@ -14,7 +14,18 @@
     <title>Social Network</title>
   </head>
   <body>
+    
     {% include 'landing/navbar.html' %}
+
+    {% if messages %}
+      <div class="row justify-content-center pt-3">
+        <div class="col-md-6">
+          {% for message in messages %}
+          <div class="alert alert-primary" role="alert">{{message}}</div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
     {% block content %}
     {% endblock content %}
 
