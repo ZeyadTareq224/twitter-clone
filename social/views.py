@@ -1,5 +1,4 @@
-from django.contrib.auth import get_user_model
-from django.http import request
+from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.urls.base import reverse_lazy
 from django.views import View
@@ -10,8 +9,9 @@ from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
-from .models import Post, Comment
-from .forms import PostForm, CommentForm
+# Models AND Forms
+from .models import Post, Comment, UserProfile
+from .forms import PostForm, CommentForm, ProfileUpdateForm
 
 
 class PostListView(LoginRequiredMixin, View):
@@ -113,4 +113,34 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageM
 
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, self.success_message)
-        return super(CommentDeleteView, self).delete(request, *args, **kwargs)    
+        return super(CommentDeleteView, self).delete(request, *args, **kwargs)
+
+
+class ProfileView(View):
+    def get(self, request, profile_id, *args, **kwargs):
+        profile = UserProfile.objects.get(id=profile_id)
+        user = profile.user
+        posts = Post.objects.filter(author=user)
+
+        context = {
+            'posts': posts,
+            'user': user,
+            'profile': profile,
+        }
+        return render(request, 'social/profile.html', context)
+
+
+class ProfileUpdateView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView):
+    model = UserProfile
+    template_name = 'social/profile_update.html'
+    form_class = ProfileUpdateForm
+
+
+    def get_success_url(self):
+        profile_id = self.kwargs['pk']
+        return reverse_lazy('profile', kwargs={'profile_id': profile_id})
+
+
+    def test_func(self):
+        profile = self.get_object()
+        return self.request.user == profile.user    

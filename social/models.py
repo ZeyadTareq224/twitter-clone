@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.db.models.fields import related
+from django.db.models.fields.related import OneToOneField
 from django.urls import reverse
 
 # Create your models here.
@@ -34,4 +36,18 @@ class Comment(models.Model):
 
     def get_absolute_url(self):
         return reverse("post_detail", kwargs={"post_id": self.post.id})
+
+
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(get_user_model(), verbose_name='user', related_name='profile', on_delete=models.CASCADE)
+    name = models.CharField(max_length=30, blank=True, null=True)
+    bio = models.TextField(max_length=500, blank=True, null=True)
+    birth_date=models.DateField(null=True, blank=True)
+    location = models.CharField(max_length=100, blank=True, null=True)
+    picture = models.ImageField(upload_to='uploads/profile_pictures', default='uploads/profile_pictures/default.png', blank=True)
+
+
+    def __str__(self):
+        return f"{self.user.email} Profile"
     

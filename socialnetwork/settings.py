@@ -136,7 +136,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
-
+MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = '/media/'
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
@@ -157,4 +158,5 @@ AUTHENTICATION_BACKENDS = [
 
 LOGIN_REDIRECT_URL = 'post_list'
 ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_AUTHENTICATION_METHOD  = 'email'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
