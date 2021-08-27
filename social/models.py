@@ -17,7 +17,7 @@ class Post(models.Model):
         return f"{self.id}"
 
     def get_absolute_url(self):
-        return reverse("model_detail", kwargs={"pk": self.pk})
+        return reverse("post_detail", kwargs={"pk": self.pk})
 
 
 class Comment(models.Model):
@@ -26,9 +26,12 @@ class Comment(models.Model):
     author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        ordering = ['-created_at']
+
     def __str__(self):
         return f"{self.comment}"
 
     def get_absolute_url(self):
-        return reverse("model_detail", kwargs={"pk": self.pk})
+        return reverse("post_detail", kwargs={"post_id": self.post.id})
     

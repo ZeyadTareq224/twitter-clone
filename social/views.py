@@ -1,12 +1,20 @@
+from django.contrib.auth import get_user_model
+from django.http import request
 from django.shortcuts import render, redirect
+from django.urls.base import reverse_lazy
 from django.views import View
+from django.views.generic.edit import DeleteView, UpdateView
 from django.contrib import messages
 
-from .models import Post
+# Mixins
+from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+
+from .models import Post, Comment
 from .forms import PostForm, CommentForm
 
 
-class PostListView(View):
+class PostListView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         posts = Post.objects.all()
         form = PostForm()
@@ -30,17 +38,79 @@ class PostListView(View):
             messages.error(request, 'Something went worng')
             return redirect('post_list')
 
-class PostDetailView(View):
+class PostDetailView(LoginRequiredMixin, View):
     def get(slef, request, pk, *args, **kwargs):
         post = Post.objects.get(id=pk)
         form = CommentForm()
+        comments = Comment.objects.filter(post=post)
 
         context = {
             'post': post,
             'form': form,
+            'comments': comments,
         }
-
+        
         return render(request, 'social/post_detail.html', context)
 
-    def post(self, request, *args, **kwargs):
-        pass
+    def post(self,request, pk, *args, **kwargs):
+        post = Post.objects.get(id=pk)
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            new_comment = form.save(commit=False)
+            new_comment.author = request.user
+            new_comment.post = post
+            new_comment.save()
+            messages.success(request, "Thanks for your feedback")
+            return redirect('post_detail', pk)
+        else:
+            messages.error(request, "Something went wrong")
+            return redirect('post_detail', pk)
+    
+
+
+
+
+class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView):
+    model = Post
+    fields = ['body']
+    template_name = 'social/post_edit.html' 
+    success_message = "Post updated"
+
+    def test_func(self):
+        post = self.get_object()
+        return self.request.user == post.author
+
+
+class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, DeleteView):
+    model = Post
+    template_name = 'social/post_delete.html'
+    success_message = "Post deleted"
+
+    def get_success_url(self):
+        return reverse_lazy('post_list')
+
+    def test_func(self):
+        post = self.get_object()
+        return self.request.user == post.author
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, self.success_message)
+        return super(PostDeleteView, self).delete(request, *args, **kwargs)    
+
+
+class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, DeleteView):
+    model = Comment
+    template_name = 'social/comment_delete.html'
+    success_message = "Comment deleted"
+
+    def get_success_url(self):
+        post_pk = self.kwargs['post_pk']
+        return reverse_lazy('post_detail', kwargs={'pk': post_pk})
+
+    def test_func(self):
+        comment = self.get_object()
+        return self.request.user == comment.author
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, self.success_message)
+        return super(CommentDeleteView, self).delete(request, *args, **kwargs)    
