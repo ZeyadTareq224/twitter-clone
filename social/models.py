@@ -46,8 +46,13 @@ class UserProfile(models.Model):
     birth_date=models.DateField(null=True, blank=True)
     location = models.CharField(max_length=100, blank=True, null=True)
     picture = models.ImageField(upload_to='uploads/profile_pictures', default='uploads/profile_pictures/default.png', blank=True)
-
+    followers = models.ManyToManyField(get_user_model(), blank=True, related_name="followers")
 
     def __str__(self):
         return f"{self.user.email} Profile"
     
+    def get_followers(self):
+        return self.followers.all()
+
+    def get_followers_count(self):
+        return self.followers.all().count()

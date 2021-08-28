@@ -122,10 +122,25 @@ class ProfileView(View):
         user = profile.user
         posts = Post.objects.filter(author=user)
 
+        followers = profile.get_followers()
+        followers_count = profile.get_followers_count()
+
+        if followers_count == 0:
+            is_following = False
+        else:
+            for follower in followers:
+                if follower == request.user:
+                    is_following = True
+                    break
+                else:
+                    is_following = False    
+        
         context = {
             'posts': posts,
             'user': user,
             'profile': profile,
+            'is_following': is_following,
+            'followers_count': followers_count,
         }
         return render(request, 'social/profile.html', context)
 
@@ -143,4 +158,20 @@ class ProfileUpdateView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageM
 
     def test_func(self):
         profile = self.get_object()
-        return self.request.user == profile.user    
+        return self.request.user == profile.user
+
+
+class AddFollower(LoginRequiredMixin , View):
+    def post(self, request, profile_id, *args, **kwargs):
+        profile = UserProfile.objects.get(id=profile_id)
+        profile.followers.add(request.user)
+        messages.success(request, f"You Followed @{profile.user.username}")
+        return redirect('profile', profile_id)
+
+
+class RemoveFollower(LoginRequiredMixin, View):
+    def post(self, request, profile_id, *args, **kwargs):
+        profile = UserProfile.objects.get(id=profile_id)
+        profile.followers.remove(request.user)
+        messages.success(request, f"You Unfollowed @{profile.user.username}")
+        return redirect('profile', profile_id)
