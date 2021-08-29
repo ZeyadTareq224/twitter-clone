@@ -17,7 +17,9 @@ from .forms import PostForm, CommentForm, ProfileUpdateForm
 
 class PostListView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        posts = Post.objects.all()
+        posts = Post.objects.filter(
+            author__profile__followers__in=[request.user.id]
+        )
         form = PostForm()
 
         context = {
