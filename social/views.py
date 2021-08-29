@@ -1,5 +1,6 @@
-from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
+from django.db.models import Q
+from django.http import HttpResponseRedirect
 from django.urls.base import reverse_lazy
 from django.views import View
 from django.views.generic.edit import DeleteView, UpdateView
@@ -175,3 +176,78 @@ class RemoveFollower(LoginRequiredMixin, View):
         profile.followers.remove(request.user)
         messages.success(request, f"You Unfollowed @{profile.user.username}")
         return redirect('profile', profile_id)
+
+
+class AddLike(LoginRequiredMixin, View):
+    def post(self, request, post_id, *args, **kwargs):
+        post = Post.objects.get(id=post_id)
+
+        # check if the user already disliked the post
+        is_dislike = False
+        for dislike in post.dislikes.all():
+            if dislike == request.user:
+                is_dislike = True
+                break
+        
+        # check if the user already disliked the post:- remove the dislike before adding like
+        if is_dislike:
+            post.dislikes.remove(request.user)
+
+        # check if the user already liked the post
+        is_like = False
+        for like in post.likes.all():
+            if like == request.user:
+                is_like = True
+                break
+        
+        if not is_like:
+            post.likes.add(request.user)
+
+        if is_like:
+            post.likes.remove(request.user)
+
+        next = request.POST.get('next', '/')
+        return HttpResponseRedirect(next)
+
+class AddDislike(LoginRequiredMixin, View):
+    def post(self, request, post_id, *args, **kwargs):
+        post = Post.objects.get(id=post_id)
+
+        # check if the user already liked the post
+        is_like = False
+        for like in post.likes.all():
+            if like == request.user:
+                is_like = True
+                break
+        
+        # check if the user already liked the post:- remove the like before adding dislike
+        if is_like:
+            post.likes.remove(request.user)
+
+
+        # check if the user already disliked the post
+        is_dislike = False
+        for dislike in post.dislikes.all():
+            if dislike == request.user:
+                is_dislike = True
+                break
+        
+        if not is_dislike:
+            post.dislikes.add(request.user)
+
+        if is_dislike:
+            post.dislikes.remove(request.user)
+
+        next = request.POST.get('next', '/')
+        return HttpResponseRedirect(next)
+
+
+class UserSeaerch(View):
+    def get(self, request, *args, **kwargs):
+        query = request.GET.get('query', None)
+        profile_list = UserProfile.objects.filter(Q(user__username__icontains=query))
+
+        context = {
+            'profile_list': profile_list,
+        }
+        return render(request, 'social/search.html', context)

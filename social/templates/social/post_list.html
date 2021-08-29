@@ -26,7 +26,25 @@
                 <div class="position-relative">
                     <p>{{ post.body }}</p>
                     <a href="{% url 'post_detail' post.id %}" class="stretched-link"></a>
-                </div>    
+                </div>
+
+                <div class="d-flex flex-row">
+                    <form method="POST" action="{% url 'like' post.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.path }}">
+                        <button style="background-color: transparent; border: none; box-shadow: none;" type="submit">
+                            <i class="far fa-thumbs-up"> <span>{{ post.likes.all.count }}</span></i>
+                        </button>
+                    </form>
+    
+                    <form method="POST" action="{% url 'dislike' post.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.path }}">
+                        <button style="background-color: transparent; border: none; box-shadow: none;" type="submit">
+                            <i class="far fa-thumbs-down"> <span>{{ post.dislikes.all.count }}</span></i>
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
         {% endfor %}

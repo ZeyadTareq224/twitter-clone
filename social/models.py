@@ -9,6 +9,9 @@ from django.urls import reverse
 class Post(models.Model):
     author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     body = models.TextField()
+    likes = models.ManyToManyField(get_user_model(), blank=True, related_name="likes")
+    dislikes = models.ManyToManyField(get_user_model(), blank=True, related_name="dislikes")
+    
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
