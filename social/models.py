@@ -24,6 +24,11 @@ class Post(models.Model):
     def get_absolute_url(self):
         return reverse("post_detail", kwargs={"pk": self.pk})
 
+    def get_likes_count(self):
+        return self.likes.all().count()
+
+    def get_dislikes_count(self):
+        return self.dislikes.all().count()    
 
 class Comment(models.Model):
     comment = models.TextField()

@@ -1,3 +1,4 @@
+from django import contrib
 from django.shortcuts import render, redirect
 from django.db.models import Q
 from django.http import HttpResponseRedirect
@@ -17,9 +18,7 @@ from .forms import PostForm, CommentForm, ProfileUpdateForm
 
 class PostListView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        posts = Post.objects.filter(
-            author__profile__followers__in=[request.user.id]
-        )
+        posts = Post.objects.filter(author__profile__followers__in=[request.user.id])
         form = PostForm()
 
         context = {
@@ -253,3 +252,16 @@ class UserSeaerch(View):
             'profile_list': profile_list,
         }
         return render(request, 'social/search.html', context)
+
+
+class FollowersListView(View):
+    def get(self, request, profile_id, *args, **kwargs):
+        profile = UserProfile.objects.get(id=profile_id)
+        followers = profile.get_followers()
+
+        context = {
+            'profile': profile, 
+            'followers': followers
+        }
+
+        return render(request, 'social/followers_list.html', context)
