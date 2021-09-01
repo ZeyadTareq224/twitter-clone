@@ -1,4 +1,5 @@
 {% extends 'landing/base.html' %}
+{% load static %}
 {% load crispy_forms_tags %}
 
 {% block content %}
@@ -62,6 +63,7 @@
         </div>
     </div>
     {% for comment in comments %}
+    {% if comment.is_parent %}
     <div class="row justify-content-center mt-3 mb-5 border-bottom">
         <div class="col-md-5 col-sm-12">
             <p>
@@ -78,8 +80,62 @@
                 {% endif %}
             </p>
             <p>{{ comment.comment }}</p>
+            <div class="d-flex flex-row">
+                <form method="POST" action="{% url 'comment_like' post.id comment.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.path }}">
+                    <button class="remove-default-btn" type="submit">
+                        <i class="far fa-thumbs-up"> <span>{{ comment.get_likes_count }}</span></i>
+                    </button>
+                </form>
+
+                <form method="POST" action="{% url 'comment_dislike' post.id comment.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.path }}">
+                    <button class="remove-default-btn" type="submit">
+                        <i class="far fa-thumbs-down"> <span>{{ comment.get_dislikes_count }}</span></i>
+                    </button>
+                </form>
+                <div>
+                    <button class="remove-default-btn"><i class="far fa-comment-dots" onclick="commentReplyToggle('{{ comment.id }}')"></i></button>
+                </div>
+            </div>
+        </div>
+        <div class="row justify-content-center mt-3 mb-5 d-none" id="{{ comment.id }}">
+            <div class="col-md-5 col-sm-12">
+                <form method="POST" action="{% url 'comment_reply' post.id comment.id %}">
+                    {% csrf_token %}
+                    {{ form | crispy }}
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-success mt-3">Submit!</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% for child_comment in comment.children %}
+    <div class="row justify-content-center mt-3 mb-">
+        <div class="col-md-4 col-sm-12 border-bottom">
+            <p>
+                <div>
+                    <a href="{% url 'profile' child_comment.author.profile.id %}">
+                        <img class="round-circle post-img" height="30" width="30" src="{{ child_comment.author.profile.picture.url }}" />
+                    </a>
+                    <p class="post-text">
+                        <a class="text-primary post-link" href="{% url 'profile' child_comment.author.profile.id %}">@{{ child_comment.author }}</a> {{ child_comment.created_at }}
+                    </p>
+                </div>
+                {% if request.user == child_comment.author %}
+                    <a href="{% url 'comment_delete' post.pk child_comment.pk %}" class="edit-color"><i class="fas fa-trash"></i></a>
+                {% endif %}
+            </p>
+            <p>{{ child_comment.comment }}</p>
         </div>
     </div>
     {% endfor %}
+    </div>
+    
+    {% endif %}
+    {% endfor %}
 </div>
+<script type="text/javascript" src="{% static 'js/comment_reply_button.js' %}"></script>
 {% endblock content %}

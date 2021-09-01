@@ -1,6 +1,6 @@
 from django.conf.urls import url
 from django.urls import path
-from .views import FollowersListView, AddDislike, AddFollower, AddLike, CommentDeleteView, PostListView, PostDetailView, PostUpdateView, PostDeleteView, ProfileUpdateView, ProfileView, RemoveFollower, UserSeaerch
+from .views import CommentReplyView, AddCommentDislike, AddCommentLike, FollowersListView, AddDislike, AddFollower, AddLike, CommentDeleteView, PostListView, PostDetailView, PostUpdateView, PostDeleteView, ProfileUpdateView, ProfileView, RemoveFollower, UserSeaerch
 
 urlpatterns = [
     path('', PostListView.as_view(), name="post_list"),
@@ -8,9 +8,11 @@ urlpatterns = [
     path('post/update/<int:pk>/', PostUpdateView.as_view(), name="post_update"),
     path('post/delete/<int:pk>/', PostDeleteView.as_view(), name="post_delete"),
     path('post/<int:post_pk>/comment/delete/<int:pk>/', CommentDeleteView.as_view(), name="comment_delete"),
+    path('post/<int:post_id>/comment/<int:comment_id>/like', AddCommentLike.as_view(), name='comment_like'),
+    path('post/<int:post_id>comment/<int:comment_id>/dislike', AddCommentDislike.as_view(), name='comment_dislike'),
     path('post/<int:post_id>/like/', AddLike.as_view(), name="like"),
     path('post/<int:post_id>/dislike/', AddDislike.as_view(), name="dislike"),
-    
+    path('post/<int:post_id>/comment/<int:comment_id>/reply/', CommentReplyView.as_view(), name="comment_reply"),
 
     path('profile/<int:profile_id>/', ProfileView.as_view(), name="profile"),
     path('profile/update/<int:pk>/', ProfileUpdateView.as_view(), name="profile_update"),

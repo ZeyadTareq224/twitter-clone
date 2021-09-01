@@ -35,6 +35,20 @@ class Comment(models.Model):
     post = models.ForeignKey('Post', on_delete=models.CASCADE)
     author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+    likes = models.ManyToManyField(get_user_model(), blank=True, related_name="comment_likes")
+    dislikes = models.ManyToManyField(get_user_model(), blank=True, related_name="comment_dislikes")
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True, related_name='+')
+
+    @property
+    def children(self):
+        return Comment.objects.filter(parent=self).all()
+
+    @property
+    def is_parent(self):
+        if self.parent is None:
+            return True
+        else:
+            return False     
 
     class Meta:
         ordering = ['-created_at']
@@ -45,7 +59,11 @@ class Comment(models.Model):
     def get_absolute_url(self):
         return reverse("post_detail", kwargs={"post_id": self.post.id})
 
+    def get_likes_count(self):
+        return self.likes.all().count()
 
+    def get_dislikes_count(self):
+        return self.dislikes.all().count() 
 
 class UserProfile(models.Model):
     user = models.OneToOneField(get_user_model(), verbose_name='user', related_name='profile', on_delete=models.CASCADE)
