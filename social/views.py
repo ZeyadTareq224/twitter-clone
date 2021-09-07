@@ -1,7 +1,7 @@
 from django import contrib
 from django.shortcuts import render, redirect
 from django.db.models import Q
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.urls.base import reverse_lazy
 from django.views import View
 from django.views.generic.edit import DeleteView, UpdateView
@@ -12,7 +12,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 # Models AND Forms
-from .models import Post, Comment, UserProfile
+from .models import Notification, Post, Comment, UserProfile
 from .forms import PostForm, CommentForm, ProfileUpdateForm
 
 
@@ -62,6 +62,9 @@ class PostDetailView(LoginRequiredMixin, View):
             new_comment.author = request.user
             new_comment.post = post
             new_comment.save()
+
+            notification = Notification.objects.create(notification_type=2, from_user=request.user, to_user=post.author, post=post)
+
             messages.success(request, "Thanks for your feedback")
             return redirect('post_detail', pk)
         else:
@@ -130,6 +133,9 @@ class CommentReplyView(LoginRequiredMixin, View):
             new_comment.post = post
             new_comment.parent = parent_comment
             new_comment.save()
+
+            notification = Notification.objects.create(notification_type=2, from_user=request.user, to_user=parent_comment.author, comment=new_comment)
+
         return redirect('post_detail', pk=post_id)
 
 class ProfileView(View):
@@ -181,6 +187,8 @@ class AddFollower(LoginRequiredMixin , View):
     def post(self, request, profile_id, *args, **kwargs):
         profile = UserProfile.objects.get(id=profile_id)
         profile.followers.add(request.user)
+        notification = Notification.objects.create(notification_type=2, from_user=request.user, to_user=profile.user)
+
         messages.success(request, f"You Followed @{profile.user.username}")
         return redirect('profile', profile_id)
 
@@ -217,6 +225,8 @@ class AddLike(LoginRequiredMixin, View):
         
         if not is_like:
             post.likes.add(request.user)
+            notification = Notification.objects.create(notification_type=1, from_user=request.user, to_user=post.author, post=post)
+
 
         if is_like:
             post.likes.remove(request.user)
@@ -281,6 +291,7 @@ class AddCommentLike(LoginRequiredMixin, View):
 
         if not is_like:
             comment.likes.add(request.user)
+            notification = Notification.objects.create(notification_type=1, from_user=request.user, to_user=comment.author, comment=comment)
 
         if is_like:
             comment.likes.remove(request.user)
@@ -343,3 +354,33 @@ class FollowersListView(View):
         }
 
         return render(request, 'social/followers_list.html', context)
+
+
+class PostNotification(View):
+    def get(self, request, notification_id, post_id, *args, **kwargs):
+        notification = Notification.objects.get(id=notification_id)
+        post = Post.objects.get(id=post_id)
+
+        notification.user_has_seen = True
+        notification.save()
+
+        return redirect('post_detail', post_id)
+
+
+class FollowNotification(View):
+    def get(self, request, notification_id, profile_id, *args, **kwargs):
+        notification = Notification.objects.get(id=notification_id)
+        profile = UserProfile.objects.get(id=profile_id)
+
+        notification.user_has_seen = True
+        notification.save()
+
+        return redirect('profile', profile_id)
+
+
+class RemoveNotification(View):
+    def delete(self, request, notification_id, *args, **kwargs):
+        notification = Notification.objects.get(id=notification_id)
+        notification.user_has_seen = True
+        notification.save()
+        return HttpResponse('Success', content_type='text/plain')

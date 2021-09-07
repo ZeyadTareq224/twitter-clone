@@ -82,3 +82,16 @@ class UserProfile(models.Model):
 
     def get_followers_count(self):
         return self.followers.all().count()
+
+
+class Notification(models.Model):
+    # 1 = Like ,2 = Comment ,3 = Follow
+    notification_type = models.IntegerField()
+    to_user = models.ForeignKey(get_user_model(), related_name='notifiaction_to', on_delete=models.CASCADE, null=True)
+    from_user = models.ForeignKey(get_user_model(), related_name='notifiaction_from', on_delete=models.CASCADE, null=True)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='+', blank=True, null=True)
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='+', blank=True, null=True)
+    date = models.DateTimeField(auto_now_add=True)
+    user_has_seen = models.BooleanField(default=False)
+    
+

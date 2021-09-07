@@ -1,4 +1,5 @@
-<div class="container">
+{% load custom_tags %}
+<div class="container col-6">
     <nav class="navbar navbar-expand-lg navbar-light">
       <div class="container-fluid">
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
@@ -28,6 +29,9 @@
               <li><a class="dropdown-item" href="{% url 'profile' request.user.profile.id %}">Profile</a></li>
               <li><a class="dropdown-item" href="{% url 'account_logout' %}">Sign Out</a></li>
             </ul>
+          </div>
+          <div class="nav-item">
+            {% show_notifications %}
           </div>
           {% endif %}
         </div>

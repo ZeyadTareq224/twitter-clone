@@ -1,6 +1,6 @@
 from django.conf.urls import url
 from django.urls import path
-from .views import CommentReplyView, AddCommentDislike, AddCommentLike, FollowersListView, AddDislike, AddFollower, AddLike, CommentDeleteView, PostListView, PostDetailView, PostUpdateView, PostDeleteView, ProfileUpdateView, ProfileView, RemoveFollower, UserSeaerch
+from .views import PostNotification, FollowNotification, CommentReplyView, AddCommentDislike, AddCommentLike, FollowersListView, AddDislike, AddFollower, AddLike, CommentDeleteView, PostListView, PostDetailView, PostUpdateView, PostDeleteView, ProfileUpdateView, ProfileView, RemoveFollower, RemoveNotification, UserSeaerch
 
 urlpatterns = [
     path('', PostListView.as_view(), name="post_list"),
@@ -22,6 +22,10 @@ urlpatterns = [
 
 
     path('search/', UserSeaerch.as_view(), name="profile_search"),
+    
+    path('notification/<int:notification_id>/post/<int:post_id>/', PostNotification.as_view(), name="post_notification"),
+    path('notification/<int:notification_id>/profile/<int:profile_id>/', FollowNotification.as_view(), name="follow_notification"),
+    path('notification/delete/<int:notification_id>/', RemoveNotification.as_view(), name="notification_delete"),
     
 ]
 
