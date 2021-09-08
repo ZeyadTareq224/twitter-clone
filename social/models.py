@@ -8,6 +8,7 @@ from django.urls import reverse
 
 class Post(models.Model):
     author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='uploads/post_images', blank=True, null=True)
     body = models.TextField()
     likes = models.ManyToManyField(get_user_model(), blank=True, related_name="likes")
     dislikes = models.ManyToManyField(get_user_model(), blank=True, related_name="dislikes")

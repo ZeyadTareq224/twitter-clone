@@ -29,7 +29,7 @@ class PostListView(LoginRequiredMixin, View):
         return render(request, 'social/post_list.html', context)
 
     def post(self, request, *args, **kwargs):
-        form = PostForm(request.POST)
+        form = PostForm(request.POST, request.FILES)
         if form.is_valid():
             new_post = form.save(commit=False)
             new_post.author = request.user
@@ -77,7 +77,7 @@ class PostDetailView(LoginRequiredMixin, View):
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView):
     model = Post
-    fields = ['body']
+    fields = ['body', 'image']
     template_name = 'social/post_edit.html' 
     success_message = "Post updated"
 
