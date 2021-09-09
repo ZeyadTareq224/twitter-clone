@@ -12,8 +12,9 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 # Models AND Forms
-from .models import Notification, Post, Comment, UserProfile
-from .forms import PostForm, CommentForm, ProfileUpdateForm
+from core.models import User
+from .models import Notification, Post, Comment, UserProfile, Thread, Message
+from .forms import PostForm, CommentForm, ProfileUpdateForm, ThreadForm, MessageForm
 
 
 class PostListView(LoginRequiredMixin, View):
@@ -384,3 +385,71 @@ class RemoveNotification(View):
         notification.user_has_seen = True
         notification.save()
         return HttpResponse('Success', content_type='text/plain')
+
+
+
+class ListThreads(View):
+    def get(self, request, *args, **kwargs):
+        threads = Thread.objects.filter(Q(user=request.user) | Q(receiver=request.user))
+
+        context = {
+            'threads': threads
+        }
+        return render(request, 'social/inbox.html', context)
+
+
+class CreateThread(View):
+    def get(self, request, *args, **kwargs):
+        form = ThreadForm()
+
+        context = {
+            'form': form
+        }
+        return render(request, 'social/create_thread.html', context)
+
+    def post(self, request, *args, **kwargs):
+        form = ThreadForm(request.POST)
+        username = request.POST.get('username')
+        try:
+            receiver = User.objects.get(username=username)
+
+            if Thread.objects.filter(user=request.user, receiver=receiver).exists():
+                thread = Thread.objects.filter(user=request.user, receiver=receiver)[0]
+                return redirect('thread', thread.id)
+
+            elif Thread.objects.filter(user=receiver, receiver=request.user).exists():
+                thread = Thread.objects.filter(user=receiver, receiver=request.user)[0]
+                return redirect('thread', thread.id)
+
+            if form.is_valid():
+                thread = Thread(user = request.user, receiver=receiver)
+                thread.save()
+                return redirect('thread', thread.id)
+        except:
+            return redirect('create_thread')
+            
+class ThreadView(View):
+    def get(self, request, thread_id, *args, **kwargs):
+        form = MessageForm()
+        thread = Thread.objects.get(id=thread_id)
+        messages_list = Message.objects.filter(thread=thread)
+        context = {
+            'form': form,
+            'thread': thread,
+            'messages_list': messages_list
+        }
+        return render(request, 'social/thread.html', context)
+
+
+class CreateMessage(View):
+    def post(self, request, thread_id, *args, **kwargs):
+        thread = Thread.objects.get(id=thread_id)
+        if thread.receiver == request.user:
+            receiver = thread.user
+        else:
+            receiver = thread.receiver
+
+        message = Message(thread=thread, sender_user=request.user, receiver_user=receiver, body=request.POST.get('message'))    
+        message.save()
+
+        return redirect('thread', thread_id)

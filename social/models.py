@@ -94,5 +94,21 @@ class Notification(models.Model):
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='+', blank=True, null=True)
     date = models.DateTimeField(auto_now_add=True)
     user_has_seen = models.BooleanField(default=False)
-    
 
+    def __str__(self):
+        return f"{self.notification_type} from {self.from_user} to {self.to_user}"
+
+
+class Thread(models.Model):
+    user = models.ForeignKey(get_user_model(), related_name='+', on_delete=models.CASCADE)
+    receiver = models.ForeignKey(get_user_model(), related_name='+', on_delete=models.CASCADE)
+
+
+class Message(models.Model):
+    thread = models.ForeignKey(Thread, related_name='+', null=True, blank=True, on_delete=models.CASCADE)
+    sender_user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='+')
+    receiver_user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='+')
+    body = models.CharField(max_length=1000)
+    image = models.ImageField(upload_to='uploads/message_images/', null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)

@@ -38,4 +38,11 @@ class ProfileUpdateForm(forms.ModelForm):
         widgets = {
             'birth_date': forms.DateInput(format=('%m/%d/%Y'), attrs={'class':'form-control', 'placeholder':'Select a date', 'type':'date'}),
         }
-    
+
+
+class ThreadForm(forms.Form):
+    username = forms.CharField(max_length=100, label='')
+
+
+class MessageForm(forms.Form):
+    message = forms.CharField(max_length=1000, label='')
