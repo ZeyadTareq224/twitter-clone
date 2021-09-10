@@ -26,6 +26,11 @@
                     <span class="dropdown-item-close" onclick="removeNotification(`{% url 'notification_delete' notification.id %}`, `{{ request.path }}`)">&times;</span>
                 </div>
                 {% endif %}
+            {% elif notification.thread %}    
+                <div class="dropdown-item-parent">
+                    <a href="{% url 'thread_notification' notification.id notification.thread.id %}">@{{ notification.from_user }} sent you a message</a>
+                    <span class="dropdown-item-close" onclick="removeNotification(`{% url 'notification_delete' notification.id %}`, `{{ request.path }}`)">&times;</span>
+                </div>
             {% else %}
                 <div class="dropdown-item-parent">
                     <a href="{% url 'follow_notification' notification.id notification.from_user.profile.id %}">@{{ notification.from_user }} has started following you</a>

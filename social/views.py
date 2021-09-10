@@ -379,6 +379,16 @@ class FollowNotification(View):
         return redirect('profile', profile_id)
 
 
+class ThreadNotification(View):
+    def get(self, request, notification_id, thread_id, *args, **kwargs):
+        notification = Notification.objects.get(id=notification_id)
+        thread = Thread.objects.get(id=thread_id)
+
+        notification.user_has_seen = True
+        notification.save()
+        return redirect('thread', thread_id)
+
+
 class RemoveNotification(View):
     def delete(self, request, notification_id, *args, **kwargs):
         notification = Notification.objects.get(id=notification_id)
@@ -426,6 +436,7 @@ class CreateThread(View):
                 thread.save()
                 return redirect('thread', thread.id)
         except:
+            messages.error(request, 'Invalid username')
             return redirect('create_thread')
             
 class ThreadView(View):
@@ -449,7 +460,14 @@ class CreateMessage(View):
         else:
             receiver = thread.receiver
 
-        message = Message(thread=thread, sender_user=request.user, receiver_user=receiver, body=request.POST.get('message'))    
-        message.save()
-
+        form = MessageForm(request.POST, request.FILES)
+        if form.is_valid():
+            message = form.save(commit=False)
+            message.thread = thread
+            message.sender_user = request.user
+            message.receiver_user = receiver
+            message.save()
+            
+        
+        Notification.objects.create(notification_type=4, from_user=request.user, to_user=receiver, thread=thread)
         return redirect('thread', thread_id)

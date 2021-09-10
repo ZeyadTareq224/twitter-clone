@@ -124,3 +124,13 @@
 	width: 25%;
 	float: right;
 }
+.message-receiver-container {
+	margin-left: auto;
+	margin-right: 0;
+}
+
+.dm-image{
+	border-radius: 10px;
+	max-width: 35%;
+	height: auto;
+}
