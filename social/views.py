@@ -13,7 +13,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 # Models AND Forms
 from core.models import User
-from .models import Notification, Post, Comment, UserProfile, Thread, Message
+from .models import Image, Notification, Post, Comment, UserProfile, Thread, Message
 from .forms import PostForm, CommentForm, ProfileUpdateForm, ThreadForm, MessageForm
 
 
@@ -31,10 +31,21 @@ class PostListView(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         form = PostForm(request.POST, request.FILES)
+        files = request.FILES.getlist('image')
+
         if form.is_valid():
             new_post = form.save(commit=False)
             new_post.author = request.user
             new_post.save()
+
+            # saving the uoloaded images to the newly created post
+            for f in files:
+                img = Image(image=f)
+                img.save()
+                new_post.image.add(img)
+            new_post.save()    
+
+
             messages.success(request, "Your post added successfully")
             return redirect('post_list')
         else:
@@ -78,7 +89,7 @@ class PostDetailView(LoginRequiredMixin, View):
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView):
     model = Post
-    fields = ['body', 'image']
+    form_class = PostForm
     template_name = 'social/post_edit.html' 
     success_message = "Post updated"
 
