@@ -1,6 +1,7 @@
 from django import contrib
 from django.shortcuts import render, redirect
 from django.db.models import Q
+from django.utils import timezone
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls.base import reverse_lazy
 from django.views import View
@@ -14,17 +15,18 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 # Models AND Forms
 from core.models import User
 from .models import Image, Notification, Post, Comment, UserProfile, Thread, Message
-from .forms import PostForm, CommentForm, ProfileUpdateForm, ThreadForm, MessageForm
+from .forms import PostForm, CommentForm, ProfileUpdateForm, ThreadForm, MessageForm, ShareForm
 
 
 class PostListView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         posts = Post.objects.filter(author__profile__followers__in=[request.user.id])
         form = PostForm()
-
+        share_form = ShareForm()
         context = {
             'post_list': posts,
             'form': form,
+            'shareform': share_form
         }
 
         return render(request, 'social/post_list.html', context)
@@ -37,6 +39,8 @@ class PostListView(LoginRequiredMixin, View):
             new_post = form.save(commit=False)
             new_post.author = request.user
             new_post.save()
+            new_post.create_tags()
+            
 
             # saving the uoloaded images to the newly created post
             for f in files:
@@ -74,6 +78,8 @@ class PostDetailView(LoginRequiredMixin, View):
             new_comment.author = request.user
             new_comment.post = post
             new_comment.save()
+            new_comment.create_tags()
+
 
             notification = Notification.objects.create(notification_type=2, from_user=request.user, to_user=post.author, post=post)
 
@@ -83,8 +89,6 @@ class PostDetailView(LoginRequiredMixin, View):
             messages.error(request, "Something went wrong")
             return redirect('post_detail', pk)
     
-
-
 
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView):
@@ -342,6 +346,26 @@ class AddCommentDislike(LoginRequiredMixin, View):
         return HttpResponseRedirect(next)
 
 
+
+class SharePostView(View):
+    def post(self, request, post_id, *args, **kwargs):
+        original_post = Post.objects.get(id=post_id)
+        form = ShareForm(request.POST)
+        if form.is_valid():
+            new_post = Post(
+                shared_body=self.request.POST.get('body'),
+                body = original_post.body,
+                author = original_post.author,
+                created_at = original_post.created_at,
+                shared_user = request.user,
+                shared_at = timezone.now(),
+            )
+            new_post.save()
+
+            for img in original_post.image.all():
+                new_post.image.add(img)
+            new_post.save()    
+        return redirect('post_list')
 
 
 class UserSeaerch(View):

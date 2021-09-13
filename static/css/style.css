@@ -134,3 +134,19 @@
 	max-width: 35%;
 	height: auto;
 }
+
+.share-btn{
+	cursor: pointer;
+}
+
+.share-btn {
+	cursor: pointer;
+}
+
+.shared-post {
+	margin-left: 30px;
+}
+
+.body a {
+	text-decoration: none;
+}

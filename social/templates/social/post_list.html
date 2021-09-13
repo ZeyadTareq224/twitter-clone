@@ -21,15 +21,50 @@
         </div>
         {% for post in post_list %}
         <div class="row justify-content-center mt-3">
-            <div class="col-md-5 col-sm-12 border-bottom">
+            <div class="col-md-6 col-sm-12 border-bottom card">
+                {% if post.shared_user %}
+                <div>
+                    <a href="{% url 'profile' post.shared_user.profile.id %}">
+                        <img class="round-circle post-img" height="30" width="30" src="{{ post.shared_user.profile.picture.url }}" />
+                    </a>
+                    
+                    <p class="post-text">
+                        <a class="text-primary post-link" href="{% url 'profile' post.shared_user.profile.id %}">@{{ post.shared_user }}</a> {{ post.created_on }}
+                    </p>
+                    
+                    
+                </div>
+                {% else %}
                 <div>
                     <a href="{% url 'profile' post.author.profile.id %}">
                         <img class="round-circle post-img" height="30" width="30" src="{{ post.author.profile.picture.url }}" />
                     </a>
+                    
+                    <p class="post-text">
+                        <a class="text-primary post-link" href="{% url 'profile' post.author.profile.id %}">@{{ post.author }}</a> {{ post.created_on }}
+                    </p>
+                    
+                </div>
+                {% endif %}
+                
+                {% if post.shared_user %}
+                <div class="position-relative border-bottom mb-3">
+                    {% if post.shared_body %}
+                    <div class="body">
+                        <p>{{ post.shared_body }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                <div>
+                    <a href="{% url 'profile' post.author.profile.id %}">
+                        <img class="round-circle post-img" height="30" width="30" src="{{ post.author.profile.picture.url }}" />
+                    </a>
+                    
                     <p class="post-text">
                         <a class="text-primary post-link" href="{% url 'profile' post.author.profile.id %}">@{{ post.author }}</a> {{ post.created_on }}
                     </p>
                 </div>
+                {% endif %}
                 <div class="position-relative">
                     {% if post.image.count > 0 %}
                         <div class="row">
@@ -40,10 +75,21 @@
                             {% endfor %}
                         </div>
                     {% endif %}
-                    <p>{{ post.body }}</p>
+                    
+                    <div class="body">
+                        <p>{{ post.body }}</p>
+                    </div>
                     <a href="{% url 'post_detail' post.id %}" class="stretched-link"></a>
                 </div>
-
+                <div class="col-md-12 col-sm-12">
+                    <form method="POST" action="{% url 'share_post' post.id %}" class="d-none" id="{{ post.id }}">
+                        {% csrf_token %}
+                        {{ shareform|crispy }}
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-sm btn-primary mt-3">Share the post</button>
+                        </div>
+                    </form>
+                </div>
                 <div class="d-flex flex-row">
                     <form method="POST" action="{% url 'like' post.id %}">
                         {% csrf_token %}
@@ -60,6 +106,7 @@
                             <i class="far fa-thumbs-down"> <span>{{ post.get_dislikes_count }}</span></i>
                         </button>
                     </form>
+                    <span onclick="shareToggle(`{{ post.id }}`)"><li class="far fa-share-square share-btn"></li></span>
                 </div>
             </div>
         </div>
