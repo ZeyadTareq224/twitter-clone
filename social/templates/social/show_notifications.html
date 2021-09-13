@@ -17,7 +17,7 @@
             {% elif notification.comment %}
                 {% if notification.notification_type == 1 %}
                 <div class="dropdown-item-parent">
-                    <a href="{% url 'post_notification-' notification.id notification.comment.post.id %}">@{{ notification.from_user }} liked your comment</a>
+                    <a href="{% url 'post_notification' notification.id notification.comment.post.id %}">@{{ notification.from_user }} liked your comment</a>
                     <span class="dropdown-item-close" onclick="removeNotification(`{% url 'notification_delete' notification.id %}`, `{{ request.path }}`)">&times;</span>
                 </div>
                 {% elif notification.notification_type == 2 %}
