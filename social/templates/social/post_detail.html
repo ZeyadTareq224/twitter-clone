@@ -17,9 +17,19 @@
     <div class="row">
         <div class="col-md-9 mb40">
             <article>
-                <img src="https://images.unsplash.com/photo-1455734729978-db1ae4f687fc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=80" alt="" class="img-fluid mb30">
+                <div>
+                    {% if post.image.count > 0 %}
+                        <div class="row">
+                            {% for img in post.image.all %}
+                            <div class="col-md-4 col-xs-12">
+                                <a href="{{ img.image.url }}"><img src="{{ img.image.url }}" class="post-image"></a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
                 <div class="post-content">
-                    <h3>A smart template that works 24/7 for your company</h3>
+                    
                     <ul class="post-meta list-inline">
                         <li class="list-inline-item">
                             <i class="fa fa-user-circle-o"></i> <a href="{% url 'profile' post.author.profile.id %}" class="post-link text-primary">{{ post.author }}</a>
@@ -27,13 +37,14 @@
                         <li class="list-inline-item">
                             <i class="fa fa-calendar-o"></i>{{ post.created_at }}
                         </li>
+                        {% if request.user == post.author %}
+                        <li class="list-inline-item"> <a href="{% url 'post_delete' post.id %}" class="fas fa-trash text-danger"></a></li>
+                        <li class="list-inline-item"> <a href="{% url 'post_update' post.id %}" class="fas fa-pen text-primary "></a></li>
+                        {% endif %}
                         
                     </ul>
-                    <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, </p>
-                    <p class="lead">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, </p>
-                    <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, </p>
+                    <p class="lead">{{ post.body }}</p>
                     <ul class="list-inline share-buttons">
-                        <li class="list-inline-item">Share Post:</li>
                         <div class="d-flex flex-row">
                             <form method="POST" action="{% url 'like' post.id %}">
                                 {% csrf_token %}
@@ -65,6 +76,9 @@
                             <h5 class="mt-0 font400 clearfix">
                                 <a href="{% url 'profile' comment.author.profile.id %}" >@{{ comment.author }}</a>
                             </h5> 
+                            {% if request.user == comment.author %}
+                                <a href="{% url 'comment_delete' post.pk comment.pk %}" class="edit-color"><i class="fas fa-trash"></i></a>
+                            {% endif %}
                             <div class="body">
                                 {{ comment.comment }}
                             </div>
