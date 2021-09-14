@@ -1,6 +1,6 @@
 from django.conf.urls import url
 from django.urls import path
-from .views import SharePostView, ThreadNotification, CreateMessage, CreateThread, ListThreads, PostNotification, FollowNotification, CommentReplyView, AddCommentDislike, AddCommentLike, FollowersListView, AddDislike, AddFollower, AddLike, CommentDeleteView, PostListView, PostDetailView, PostUpdateView, PostDeleteView, ProfileUpdateView, ProfileView, RemoveFollower, RemoveNotification, ThreadView, UserSeaerch
+from .views import FriendRequestNotification, CancelFriendRequest, AddFriend, SharePostView, ThreadNotification, CreateMessage, CreateThread, ListThreads, PostNotification, FollowNotification, CommentReplyView, AddCommentDislike, AddCommentLike, FollowersListView, AddDislike, AddFollower, AddLike, CommentDeleteView, PostListView, PostDetailView, PostUpdateView, PostDeleteView, ProfileUpdateView, ProfileView, RemoveFollower, RemoveNotification, ThreadView, UserSeaerch
 
 urlpatterns = [
     path('', PostListView.as_view(), name="post_list"),
@@ -20,6 +20,8 @@ urlpatterns = [
     path('profile/<int:profile_id>/followers/add/', AddFollower.as_view(), name="add_follower"),
     path('profile/<int:profile_id>/followers/remove/', RemoveFollower.as_view(), name="remove_follower"),
     path('profile/<int:profile_id>/followers/', FollowersListView.as_view(), name="followers_list"),
+    path('profile/<int:profile_id>/friend-request/', AddFriend.as_view(), name="add_friend"),
+    path('profile/<int:profile_id>/cancel-friend-request/', CancelFriendRequest.as_view(), name="cancel_request"),
 
 
     path('search/', UserSeaerch.as_view(), name="profile_search"),
@@ -27,6 +29,7 @@ urlpatterns = [
     path('notification/<int:notification_id>/post/<int:post_id>/', PostNotification.as_view(), name="post_notification"),
     path('notification/<int:notification_id>/profile/<int:profile_id>/', FollowNotification.as_view(), name="follow_notification"),
     path('notification/<int:notification_id>/DM/<int:thread_id>/', ThreadNotification.as_view(), name="thread_notification"),
+    path('notification/<int:notification_id>/friend-request/<int:profile_id>/', FriendRequestNotification.as_view(), name="friend_request_notification"),
     path('notification/delete/<int:notification_id>/', RemoveNotification.as_view(), name="notification_delete"),
     
     path('inbox/', ListThreads.as_view(), name="inbox"),

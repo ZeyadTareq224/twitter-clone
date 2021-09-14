@@ -66,6 +66,20 @@
                     </form>
                 {% endif %}
             {% endif %}
+
+            {% if request.user not in profile.friend_requests.all %}
+                <form method="POST" action="{% url 'add_friend' profile.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-primary ">Add Friend</button>
+                    
+                </form>
+            {% else %}
+                <form method="POST" action="{% url 'cancel_request' profile.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger ">Cancel request</button>
+                    
+                </form>
+            {% endif %}
         </div>
     </div>
 

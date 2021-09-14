@@ -160,7 +160,6 @@ class ProfileView(View):
         profile = UserProfile.objects.get(id=profile_id)
         user = profile.user
         posts = Post.objects.filter(author=user)
-
         followers = profile.get_followers()
         followers_count = profile.get_followers_count()
 
@@ -396,7 +395,7 @@ class FollowersListView(View):
 class PostNotification(View):
     def get(self, request, notification_id, post_id, *args, **kwargs):
         notification = Notification.objects.get(id=notification_id)
-        post = Post.objects.get(id=post_id)
+        
 
         notification.user_has_seen = True
         notification.save()
@@ -407,7 +406,7 @@ class PostNotification(View):
 class FollowNotification(View):
     def get(self, request, notification_id, profile_id, *args, **kwargs):
         notification = Notification.objects.get(id=notification_id)
-        profile = UserProfile.objects.get(id=profile_id)
+        
 
         notification.user_has_seen = True
         notification.save()
@@ -418,12 +417,18 @@ class FollowNotification(View):
 class ThreadNotification(View):
     def get(self, request, notification_id, thread_id, *args, **kwargs):
         notification = Notification.objects.get(id=notification_id)
-        thread = Thread.objects.get(id=thread_id)
 
         notification.user_has_seen = True
         notification.save()
         return redirect('thread', thread_id)
 
+
+class FriendRequestNotification(View):
+    def get(self, request, notification_id, profile_id, *args, **kwargs):
+        notification = Notification.objects.get(id=notification_id)
+        notification.user_has_seen = True
+        notification.save()
+        return redirect('profile', profile_id) # TODO CHANGE THIS
 
 class RemoveNotification(View):
     def delete(self, request, notification_id, *args, **kwargs):
@@ -507,3 +512,24 @@ class CreateMessage(View):
         
         Notification.objects.create(notification_type=4, from_user=request.user, to_user=receiver, thread=thread)
         return redirect('thread', thread_id)
+
+
+class AddFriend(View):
+    def post(self, request, profile_id, *args, **kwargs):
+        profile = UserProfile.objects.get(id=profile_id)
+        if request.user != profile.user:
+            profile.friend_requests.add(request.user)
+            profile.save()
+            receiver = profile.user
+            Notification.objects.create(notification_type=5, from_user=request.user, to_user=receiver)
+            messages.success(request, 'Friend request sent successfully')
+            return redirect('profile', profile_id)
+
+
+class CancelFriendRequest(View):
+    def post(self, request, profile_id, *args, **kwargs):
+        profile = UserProfile.objects.get(id=profile_id)
+        profile.friend_requests.remove(request.user)
+        profile.save()
+        messages.success(request, 'Friend request canceled successfully')
+        return redirect('profile', profile_id)

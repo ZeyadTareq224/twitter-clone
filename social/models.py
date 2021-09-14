@@ -105,6 +105,8 @@ class UserProfile(models.Model):
     location = models.CharField(max_length=100, blank=True, null=True)
     picture = models.ImageField(upload_to='uploads/profile_pictures', default='uploads/profile_pictures/default.png', blank=True)
     followers = models.ManyToManyField(get_user_model(), blank=True, related_name="followers")
+    friend_requests = models.ManyToManyField(get_user_model(), blank=True, related_name="friend_requests")
+    friends = models.ManyToManyField(get_user_model(), blank=True, related_name="friends")
 
     def __str__(self):
         return f"{self.user.email} Profile"
@@ -115,6 +117,8 @@ class UserProfile(models.Model):
     def get_followers_count(self):
         return self.followers.all().count()
 
+    def get_firends_count(self):
+        return self.friends.all().count()
 
 
 class Thread(models.Model):

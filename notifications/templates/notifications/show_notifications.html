@@ -32,10 +32,18 @@
                     <span class="dropdown-item-close" onclick="removeNotification(`{% url 'notification_delete' notification.id %}`, `{{ request.path }}`)">&times;</span>
                 </div>
             {% else %}
+                {% if notification.notification_type == 3 %}
                 <div class="dropdown-item-parent">
                     <a href="{% url 'follow_notification' notification.id notification.from_user.profile.id %}">@{{ notification.from_user }} has started following you</a>
                     <span class="dropdown-item-close" onclick="removeNotification(`{% url 'notification_delete' notification.id %}`, `{{ request.path }}`)">&times;</span>
                 </div>
+                {% endif %}
+                {% if notification.notification_type == 5 %}
+                <div class="dropdown-item-parent">
+                    <a href="{% url 'friend_request_notification' notification.id notification.from_user.profile.id %}">@{{ notification.from_user }} has sent you a friend request</a>
+                    <span class="dropdown-item-close" onclick="removeNotification(`{% url 'notification_delete' notification.id %}`, `{{ request.path }}`)">&times;</span>
+                </div>
+                {% endif %}
             {% endif %}
         {% endfor %}
     </div>

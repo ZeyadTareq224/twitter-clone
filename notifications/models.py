@@ -4,7 +4,7 @@ from social.models import Post, Comment, Thread
 
 
 class Notification(models.Model):
-    # 1 = Like ,2 = Comment ,3 = Follow, 4 = DM
+    # 1 = Like ,2 = Comment ,3 = Follow, 4 = DM, 5 = Friend Request
     notification_type = models.IntegerField()
     to_user = models.ForeignKey(get_user_model(), related_name='notifiaction_to', on_delete=models.CASCADE, null=True)
     from_user = models.ForeignKey(get_user_model(), related_name='notifiaction_from', on_delete=models.CASCADE, null=True)
