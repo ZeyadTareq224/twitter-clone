@@ -70,51 +70,7 @@
     </div>
 
     {% for post in posts %}
-    <div class="row justify-content-center mt-5">
-        <div class="col-md-8 col-sm-12 border-bottom">
-            <div>
-                <a href="{% url 'profile' post.author.profile.id %}">
-                    <img class="round-circle post-img" height="30" width="30" src="{{ post.author.profile.picture.url }}" />
-                </a>
-                <p class="post-text">
-                    <a class="text-primary post-link" href="{% url 'profile' post.author.profile.id %}">@{{ post.author }}</a> {{ post.created_at }}
-                </p>
-            </div>
-            <div class="position-relative">
-                {% if post.image.count > 0 %}
-                    <div class="row">
-                        {% for img in post.image.all %}
-                        <div class="col-md-4 col-xs-12">
-                            <img src="{{ img.image.url }}" class="post-image">
-                        </div>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-                <div class='body'>
-                    <p>{{ post.body }}</p>
-                </div>
-                <a href="{% url 'post_detail' post.id %}" class="stretched-link"></a>
-            </div>
-
-            <div class="d-flex flex-row">
-                <form method="POST" action="{% url 'like' post.id %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="next" value="{{ request.path }}">
-                    <button class="remove-default-btn" type="submit">
-                        <i class="far fa-thumbs-up"> <span>{{ post.get_likes_count }}</span></i>
-                    </button>
-                </form>
-
-                <form method="POST" action="{% url 'dislike' post.id %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="next" value="{{ request.path }}">
-                    <button class="remove-default-btn" type="submit">
-                        <i class="far fa-thumbs-down"> <span>{{ post.get_dislikes_count }}</span></i>
-                    </button>
-                </form>
-        </div>
-        </div>
-    </div>
+        {% include 'social/_includes/post_card.html' %}
     {% endfor %}
 </div>
 {% endblock content %}
