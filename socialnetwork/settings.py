@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'core',
     'landing',
     'social',
+    'notifications',
 
     # 3rd party apps
     'crispy_forms',

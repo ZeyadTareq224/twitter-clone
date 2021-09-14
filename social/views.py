@@ -14,8 +14,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 # Models AND Forms
 from core.models import User
-from .models import Image, Notification, Post, Comment, UserProfile, Thread, Message
+from .models import Image, Post, Comment, UserProfile, Thread, Message
 from .forms import PostForm, CommentForm, ProfileUpdateForm, ThreadForm, MessageForm, ShareForm
+from notifications.models import Notification
 
 
 class PostListView(LoginRequiredMixin, View):
