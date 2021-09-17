@@ -46,21 +46,15 @@
                     <p class="lead">{{ post.body }}</p>
                     <ul class="list-inline share-buttons">
                         <div class="d-flex flex-row">
-                            <form method="POST" action="{% url 'like' post.id %}">
+                            <form method="POST" >
                                 {% csrf_token %}
                                 <input type="hidden" name="next" value="{{ request.path }}">
-                                <button class="remove-default-btn" type="submit">
-                                    <i class="far fa-thumbs-up"> <span>{{ post.get_likes_count }}</span></i>
+                                <button class="remove-default-btn" type="submit" onclick="likeSubmit(event, {{post.id}})">
+                                    <i class="far fa-thumbs-up"> <span id="likes-counter-{{post.id}}">{{ post.get_likes_count }}</span></i>
                                 </button>
                             </form>
                             
-                            <form method="POST" action="{% url 'dislike' post.id %}">
-                                {% csrf_token %}
-                                <input type="hidden" name="next" value="{{ request.path }}">
-                                <button class="remove-default-btn" type="submit">
-                                    <i class="far fa-thumbs-down"> <span>{{ post.get_dislikes_count }}</span></i>
-                                </button>
-                            </form>
+                            
                         </div>
                         
                     </ul>
@@ -138,7 +132,7 @@
                     
                     <hr class="mb40">
                     <h4 class="mb40 text-uppercase font500">Post a comment</h4>
-                    <form method="POST">
+                    <form method="POST" action="{% url 'like' post.id %}" id="post-like-form-{{post.id}}">
                         {% csrf_token %}
                         {{ form | crispy }}
                         <div class="clearfix float-right">
@@ -181,5 +175,9 @@
     </div>
 </div>
 <hr>
+
+{% block extra_scripts %}
+<script type="text/javascript" src="{% static 'js/postReactions.js' %}"></script>
+{% endblock extra_scripts %}
 
 {% endblock content %}

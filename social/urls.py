@@ -1,6 +1,6 @@
 from django.conf.urls import url
 from django.urls import path
-from .views import FriendRequestNotification, CancelFriendRequest, AddFriend, SharePostView, ThreadNotification, CreateMessage, CreateThread, ListThreads, PostNotification, FollowNotification, CommentReplyView, AddCommentDislike, AddCommentLike, FollowersListView, AddDislike, AddFollower, AddLike, CommentDeleteView, PostListView, PostDetailView, PostUpdateView, PostDeleteView, ProfileUpdateView, ProfileView, RemoveFollower, RemoveNotification, ThreadView, UserSeaerch
+from .views import FriendRequestNotification, CancelFriendRequest, AddFriend, SharePostView, ThreadNotification, CreateMessage, CreateThread, ListThreads, PostNotification, FollowNotification, CommentReplyView, AddCommentDislike, AddCommentLike, FollowersListView, AddFollower, AddLike, CommentDeleteView, PostListView, PostDetailView, PostUpdateView, PostDeleteView, ProfileUpdateView, ProfileView, RemoveFollower, RemoveNotification, ThreadView, UserSeaerch
 
 urlpatterns = [
     path('', PostListView.as_view(), name="post_list"),
@@ -11,7 +11,6 @@ urlpatterns = [
     path('post/<int:post_id>/comment/<int:comment_id>/like', AddCommentLike.as_view(), name='comment_like'),
     path('post/<int:post_id>comment/<int:comment_id>/dislike', AddCommentDislike.as_view(), name='comment_dislike'),
     path('post/<int:post_id>/like/', AddLike.as_view(), name="like"),
-    path('post/<int:post_id>/dislike/', AddDislike.as_view(), name="dislike"),
     path('post/<int:post_id>/comment/<int:comment_id>/reply/', CommentReplyView.as_view(), name="comment_reply"),
     path('post/<int:post_id>/share/', SharePostView.as_view(), name='share_post'),
 

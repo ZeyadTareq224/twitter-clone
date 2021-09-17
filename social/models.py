@@ -10,7 +10,6 @@ class Post(models.Model):
     image = models.ManyToManyField('Image', blank=True)
     body = models.TextField()
     likes = models.ManyToManyField(get_user_model(), blank=True, related_name="likes")
-    dislikes = models.ManyToManyField(get_user_model(), blank=True, related_name="dislikes")
     created_at = models.DateTimeField(auto_now_add=True)
     tags = models.ManyToManyField('Tag', blank=True)
 
@@ -27,10 +26,6 @@ class Post(models.Model):
 
     def get_likes_count(self):
         return self.likes.all().count()
-
-    def get_dislikes_count(self):
-        return self.dislikes.all().count()
-
     
     def create_tags(self):
         for word in self.body.split():
