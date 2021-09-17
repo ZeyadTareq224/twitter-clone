@@ -66,7 +66,6 @@ function formatTags() {
 			if (words[j][0] === '#') {
 				let replacedText = bodyText.replace(/\s\#(.*?)(\s|$)/g, ` <a href="#">${words[j]}</a>`);
 				elements[i].innerHTML = replacedText;
-				console.log(replacedText)
 			}
 		}
 	}
