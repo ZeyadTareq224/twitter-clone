@@ -1,6 +1,6 @@
 from django.conf.urls import url
 from django.urls import path
-from .views import FriendRequestNotification, CancelFriendRequest, AddFriend, SharePostView, ThreadNotification, CreateMessage, CreateThread, ListThreads, PostNotification, FollowNotification, CommentReplyView, AddCommentDislike, AddCommentLike, FollowersListView, AddFollower, AddLike, CommentDeleteView, PostListView, PostDetailView, PostUpdateView, PostDeleteView, ProfileUpdateView, ProfileView, RemoveFollower, RemoveNotification, ThreadView, UserSeaerch
+from .views import FriendRequestNotification, CancelFriendRequest, AddFriend, SharePostView, ThreadNotification, CreateMessage, CreateThread, ListThreads, PostNotification, FollowNotification, CommentReplyView, AddCommentLike, FollowersListView, AddFollower, AddLike, CommentDeleteView, PostListView, PostDetailView, PostUpdateView, PostDeleteView, ProfileUpdateView, ProfileView, RemoveFollower, RemoveNotification, ThreadView, UserSeaerch
 
 urlpatterns = [
     path('', PostListView.as_view(), name="post_list"),
@@ -9,7 +9,6 @@ urlpatterns = [
     path('post/delete/<int:pk>/', PostDeleteView.as_view(), name="post_delete"),
     path('post/<int:post_pk>/comment/delete/<int:pk>/', CommentDeleteView.as_view(), name="comment_delete"),
     path('post/<int:post_id>/comment/<int:comment_id>/like', AddCommentLike.as_view(), name='comment_like'),
-    path('post/<int:post_id>comment/<int:comment_id>/dislike', AddCommentDislike.as_view(), name='comment_dislike'),
     path('post/<int:post_id>/like/', AddLike.as_view(), name="like"),
     path('post/<int:post_id>/comment/<int:comment_id>/reply/', CommentReplyView.as_view(), name="comment_reply"),
     path('post/<int:post_id>/share/', SharePostView.as_view(), name='share_post'),

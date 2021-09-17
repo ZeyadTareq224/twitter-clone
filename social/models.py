@@ -47,7 +47,6 @@ class Comment(models.Model):
     author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     likes = models.ManyToManyField(get_user_model(), blank=True, related_name="comment_likes")
-    dislikes = models.ManyToManyField(get_user_model(), blank=True, related_name="comment_dislikes")
     parent = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True, related_name='+')
     tags = models.ManyToManyField('Tag', blank=True)
 
@@ -74,9 +73,6 @@ class Comment(models.Model):
 
     def get_likes_count(self):
         return self.likes.all().count()
-
-    def get_dislikes_count(self):
-        return self.dislikes.all().count() 
 
     def create_tags(self):
         if self.comment:

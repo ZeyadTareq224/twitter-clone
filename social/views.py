@@ -248,15 +248,6 @@ class AddCommentLike(LoginRequiredMixin, View):
     def post(self, request, comment_id, *args, **kwargs):
         comment = Comment.objects.get(id=comment_id)
 
-        is_dislike = False
-
-        for dislike in comment.dislikes.all():
-            if dislike == request.user:
-                is_dislike = True
-                break
-
-        if is_dislike:
-            comment.dislikes.remove(request.user)
 
         is_like = False
 
@@ -272,38 +263,12 @@ class AddCommentLike(LoginRequiredMixin, View):
         if is_like:
             comment.likes.remove(request.user)
 
-        next = request.POST.get('next', '/')
-        return HttpResponseRedirect(next)
 
-class AddCommentDislike(LoginRequiredMixin, View):
-    def post(self, request, comment_id, *args, **kwargs):
-        comment = Comment.objects.get(id=comment_id)
+        data = {
+            'likes_count': comment.get_likes_count()
+        }
+        return JsonResponse(data)
 
-        is_like = False
-
-        for like in comment.likes.all():
-            if like == request.user:
-                is_like = True
-                break
-
-        if is_like:
-            comment.likes.remove(request.user)
-
-        is_dislike = False
-
-        for dislike in comment.dislikes.all():
-            if dislike == request.user:
-                is_dislike = True
-                break
-
-        if not is_dislike:
-            comment.dislikes.add(request.user)
-
-        if is_dislike:
-            comment.dislikes.remove(request.user)
-
-        next = request.POST.get('next', '/')
-        return HttpResponseRedirect(next)
 
 
 

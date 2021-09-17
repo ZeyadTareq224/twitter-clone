@@ -28,7 +28,7 @@
         <div class="d-flex flex-row">
             <form method="POST" action="{% url 'like' post.id %}" id="post-like-form-{{post.id}}">
                 {% csrf_token %}
-                <button class="remove-default-btn" type="submit" onclick="likeSubmit(event, {{post.id}})">
+                <button class="remove-default-btn" type="submit" onclick="postLikeSubmit(event, {{post.id}})">
                     <i class="far fa-thumbs-up"> <span id="likes-counter-{{post.id}}">{{post.get_likes_count}}</span></i>
                 </button>
             </form>
