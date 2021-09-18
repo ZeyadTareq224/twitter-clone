@@ -1,5 +1,6 @@
 {% extends 'landing/base.html' %}
 
+{% load static %}
 {% block content %}
 <div class="container">
     <div class="row mt-5">
@@ -83,8 +84,30 @@
         </div>
     </div>
 
+    <div class="infinite-container">
     {% for post in posts %}
+        <div class="infinite-item">
         {% include 'social/_includes/post_card.html' %}
+        </div>
     {% endfor %}
+    </div>
+    <div class="d-flex d-none position-fixed" style="top:35vh;left: 46vw;">
+        <button class="btn btn-primary loading">
+            <span class="spinner-border spinner-border-sm"></span>
+            Please wait...
+        </button>
+        
+    </div>
+    <div class="pagination">
+        {% if posts.has_next %}
+        <li class="page-item">
+            <a class="page-link infinite-more-link d-none" href="?page={{ posts.next_page_number }}">Next</a>
+          </li>
+        {% endif %}
+    </div>
 </div>
+
+<script type="text/javascript" src="{% static 'js/infinite_scroll_scripts/jquery.waypoints.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/infinite_scroll_scripts/infinite.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/infinite_scroll_scripts/initiateInfiniteScroll.js' %}"></script>
 {% endblock content %}

@@ -7,6 +7,7 @@ from django.urls.base import reverse_lazy
 from django.views import View
 from django.views.generic.edit import DeleteView, UpdateView
 from django.contrib import messages
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # Mixins
 from django.contrib.messages.views import SuccessMessageMixin
@@ -15,19 +16,30 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 # Models AND Forms
 from core.models import User
 from .models import Image, Post, Comment, UserProfile, Thread, Message
-from .forms import PostForm, CommentForm, ProfileUpdateForm, ThreadForm, MessageForm, ShareForm
+from .forms import PostForm, CommentForm, ProfileUpdateForm, ThreadForm, MessageForm
 from notifications.models import Notification
 
 
 class PostListView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
+        page = request.GET.get('page', 1)
         posts = Post.objects.filter(author__profile__followers__in=[request.user.id])
+        paginator = Paginator(posts, 2)
+
+        try:
+            posts = paginator.page(page)
+        except PageNotAnInteger:
+            posts = paginator.page(1)
+        except EmptyPage:
+            posts = paginator.page(paginator.num_pages)
+
+
+
         form = PostForm()
-        share_form = ShareForm()
         context = {
             'post_list': posts,
             'form': form,
-            'shareform': share_form
+            
         }
 
         return render(request, 'social/post_list.html', context)
@@ -159,7 +171,18 @@ class ProfileView(View):
     def get(self, request, profile_id, *args, **kwargs):
         profile = UserProfile.objects.get(id=profile_id)
         user = profile.user
+
+        page = request.GET.get('page', 1)
         posts = Post.objects.filter(author=user)
+        paginator = Paginator(posts, 3)
+        try:
+            posts = paginator.page(page)
+        except PageNotAnInteger:
+            posts = paginator.page(1)
+        except EmptyPage:
+            posts = paginator.page(paginator.num_pages)
+
+        
         followers = profile.get_followers()
         followers_count = profile.get_followers_count()
 
