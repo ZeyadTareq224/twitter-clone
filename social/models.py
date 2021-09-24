@@ -136,3 +136,25 @@ class Tag(models.Model):
     
     def __str__(self):
         return self.name
+
+
+class PageRule(models.Model):
+    rule = models.TextField()
+
+    def __str__(self):
+        return self.rule
+
+
+class Page(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    posts = models.ManyToManyField(Post, blank=True)
+    owner = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="+")
+    members = models.ManyToManyField(get_user_model(), blank=True, related_name="+")
+    rules = models.ManyToManyField(PageRule, blank=True, related_name="+")
+    blocked_users = models.ManyToManyField(get_user_model(), blank=True, related_name="+")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
